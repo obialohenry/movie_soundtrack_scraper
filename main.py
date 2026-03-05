@@ -1,4 +1,5 @@
 import requests
+from bs4 import BeautifulSoup
 
 # ---------- Project Summary ---------- #
 # 1. Prompt the user to enter a movie name
@@ -55,6 +56,7 @@ while is_running:
   headers = {
     "User-Agent": "MovieSoundtrackScraper/1.0 (obilaorchisomebi123@gmail.com)"
   }
+  WIKIPEDIA_MOVIE_PAGE_URL = ""
 
   response = requests.get(url=WIKIPEDIA_URL,headers=headers,params=WIKEPEDIA_PARAMS)
   response.raise_for_status()
@@ -67,6 +69,31 @@ while is_running:
     print(f"Wikipedia Movie Page: { WIKIPEDIA_MOVIE_PAGE_URL}")
   else:
     print(f"Could not get {movie_name} Wikipedia's Soundtrack page.")
-    is_running = False
+    break
   
   # ---------- LOCATE AND SCRAPE THE MOVIES SOUNDTRACK PAGE ON WIKIPEDIA ---------- #
+  soundtrack_titles = []
+  print()
+  movie_page_response = requests.get(WIKIPEDIA_MOVIE_PAGE_URL,headers=headers)
+  movie_page_response.raise_for_status()
+  movie_page = movie_page_response.text
+
+  soup = BeautifulSoup(movie_page,'html.parser')
+  track_list_tag = soup.find("table", class_="tracklist")
+  if track_list_tag:
+      soundtrack_title_rows = track_list_tag.find_all("tr")[1:-1]
+
+      for title_row in soundtrack_title_rows:
+         cell = title_row.td
+
+         if cell:
+            title = cell.get_text(strip=True)
+            print(title)
+            song_title = ''
+            if '"' in title:
+               song_title = title.split('"')[1]
+            soundtrack_titles.append(song_title)
+      print(soundtrack_titles)
+  else:
+      print("Tracklist table not found!")
+

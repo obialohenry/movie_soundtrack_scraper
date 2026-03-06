@@ -1,5 +1,26 @@
 import requests
 from bs4 import BeautifulSoup
+import os
+from dotenv import load_dotenv
+import spotipy
+from spotipy.oauth2 import SpotifyOAuth
+
+# Load environment variables from .env file
+load_dotenv()
+
+ID = os.environ["CLIENT_ID"]
+SECRET = os.environ["CLIENT_SECRET"]
+SCOPE = "playlist-modify-private"
+REDIRECT_URI = "https://example.com"
+
+# Spotify client with OAuth
+sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
+    client_id=ID,
+    client_secret=SECRET,
+    redirect_uri=REDIRECT_URI,
+    scope=SCOPE,
+    username="Obilaor Chisomebi"
+))
 
 # ---------- Project Summary ---------- #
 # 1. Prompt the user to enter a movie name
@@ -72,7 +93,7 @@ while is_running:
     break
   
   # ---------- LOCATE AND SCRAPE THE MOVIES SOUNDTRACK PAGE ON WIKIPEDIA ---------- #
-  soundtrack_titles = []
+  soundtrack_song_titles = []
   print()
   movie_page_response = requests.get(WIKIPEDIA_MOVIE_PAGE_URL,headers=headers)
   movie_page_response.raise_for_status()
@@ -80,6 +101,8 @@ while is_running:
 
   soup = BeautifulSoup(movie_page,'html.parser')
   track_list_tag = soup.find("table", class_="tracklist")
+
+  # ---------- EXTRACT ALL SOUNDTRACK SONG TITLES ---------- #
   if track_list_tag:
       soundtrack_title_rows = track_list_tag.find_all("tr")[1:-1]
 
@@ -92,8 +115,50 @@ while is_running:
             song_title = ''
             if '"' in title:
                song_title = title.split('"')[1]
-            soundtrack_titles.append(song_title)
-      print(soundtrack_titles)
+            soundtrack_song_titles.append(song_title)
+      print(soundtrack_song_titles)
   else:
       print("Tracklist table not found!")
+      break
+  
+  # ---------- SEARCH FOR EACH SONG USING THE SPOTIFY WEB API ---------- #
+  
+  current_user = sp.current_user()
+  if current_user:
+    user_id = current_user['id']
+    print(user_id)
 
+  search = sp.search("Rap God",limit=1,type="track")
+  print(search)
+
+
+
+#  user_playlist_create(user, name, public=True, collaborative=False, description='')
+
+#     Creates a playlist for a user
+
+#     Parameters:
+
+#             user - the id of the user
+
+#             name - the name of the playlist
+
+#             public - is the created playlist public
+
+#             collaborative - is the created playlist collaborative
+
+#             description - the description of the playlist
+
+
+
+  #  playlist_add_items(playlist_id, items, position=None)
+
+  #   Adds tracks/episodes to a playlist
+
+  #   Parameters:
+
+  #           playlist_id - the id of the playlist
+
+  #           items - a list of track/episode URIs or URLs
+
+  #           position - the position to add the tracks

@@ -18,8 +18,7 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
     client_id=ID,
     client_secret=SECRET,
     redirect_uri=REDIRECT_URI,
-    scope=SCOPE,
-    username="Mitchelle"
+    scope=SCOPE
 ))
 
 # ---------- Project Summary ---------- #
@@ -148,22 +147,22 @@ while is_running:
 
   # ---------- CREATE A NEW PRIVATE SPOTIFY PLAYLIST ---------- #
 
+  playlist_id = ""
+
   try:
-    soundtracks_playlist = sp.user_playlist_create(user=user_id, name=f"{movie_name} Soundtracks", public=False)
+    soundtracks_playlist = sp.current_user_playlist_create(
+    name=f"{movie_name} Soundtracks",
+    public=False
+  )
     print(soundtracks_playlist)
   except spotipy.SpotifyException as e:
      print("Spotify API error:", e)
+  else:
+    if soundtracks_playlist:
+      playlist_id = soundtracks_playlist["id"]
+  print()
+  print(playlist_id)
 
+  # ---------- ADD ALL SUCCESSFULLY FOUND TRACKS TO THE PLAYLIST ---------- #
 
-
-  #  playlist_add_items(playlist_id, items, position=None)
-
-  #   Adds tracks/episodes to a playlist
-
-  #   Parameters:
-
-  #           playlist_id - the id of the playlist
-
-  #           items - a list of track/episode URIs or URLs
-
-  #           position - the position to add the tracks
+  #  playlist_add_items(playlist_id, items, position=None)

@@ -8,9 +8,9 @@ from spotipy.oauth2 import SpotifyOAuth
 # Load environment variables from .env file
 load_dotenv()
 
-ID = os.environ["CLIENT_ID"]
-SECRET = os.environ["CLIENT_SECRET"]
-SCOPE = "playlist-modify-private"
+ID = os.environ["NKEMS_CLIENT_ID"]
+SECRET = os.environ["NKEMS_CLIENT_SECRET"]
+SCOPE = "playlist-modify-private playlist-modify-public"
 REDIRECT_URI = "https://example.com"
 
 # Spotify client with OAuth
@@ -19,7 +19,7 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
     client_secret=SECRET,
     redirect_uri=REDIRECT_URI,
     scope=SCOPE,
-    username="Obilaor Chisomebi"
+    username="Mitchelle"
 ))
 
 # ---------- Project Summary ---------- #
@@ -122,32 +122,37 @@ while is_running:
       break
   
   # ---------- SEARCH FOR EACH SONG USING THE SPOTIFY WEB API ---------- #
+  user_id = ""
+  track_uris = []
   
   current_user = sp.current_user()
   if current_user:
     user_id = current_user['id']
     print(user_id)
 
-  search = sp.search("Rap God",limit=1,type="track")
-  print(search)
+  def search_for_a_song(song_title:str)->str:
+    """"""
+    search_result = sp.search(song_title,limit=1,type="track")
+    if search_result:
+      items = search_result['tracks']['items']
+      if items:
+        track = items[0]
+        print(f"Spoitify URI for {song_title}: {track['uri']}")
+        return track['uri']
+    return ""
 
+  for song_title in soundtrack_song_titles:
+     song = search_for_a_song(song_title)
+     if song:
+        track_uris.append(song)
 
+  # ---------- CREATE A NEW PRIVATE SPOTIFY PLAYLIST ---------- #
 
-#  user_playlist_create(user, name, public=True, collaborative=False, description='')
-
-#     Creates a playlist for a user
-
-#     Parameters:
-
-#             user - the id of the user
-
-#             name - the name of the playlist
-
-#             public - is the created playlist public
-
-#             collaborative - is the created playlist collaborative
-
-#             description - the description of the playlist
+  try:
+    soundtracks_playlist = sp.user_playlist_create(user=user_id, name=f"{movie_name} Soundtracks", public=False)
+    print(soundtracks_playlist)
+  except spotipy.SpotifyException as e:
+     print("Spotify API error:", e)
 
 
 

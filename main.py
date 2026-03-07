@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
+import pandas
 
 # Load environment variables from .env file
 load_dotenv()
@@ -20,7 +21,18 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
     redirect_uri=REDIRECT_URI,
     scope=SCOPE
 ))
+scraped_soundtracks = {
+  "song titles": [],
+  "found on spotify": [],
+  "spotify URI": [],
+  
+}
 
+def add_scraped_soundtracks(song_title:str,found_on_spotify:str,uri:str)->None:
+  """"""
+  scraped_soundtracks["song titles"].append(song_title)
+  scraped_soundtracks["found on spotify"].append(found_on_spotify)
+  scraped_soundtracks["spotify URI"].append(uri)
 # ---------- Project Summary ---------- #
 # 1. Prompt the user to enter a movie name
 # 2. Locate and scrape the movie's soundtrack page on Wikipedia.
@@ -137,7 +149,10 @@ while is_running:
       if items:
         track = items[0]
         print(f"Spoitify URI for {song_title}: {track['uri']}")
+        add_scraped_soundtracks(song_title=song_title,found_on_spotify="Yes",uri=track['uri'])
         return track['uri']
+      else:
+        add_scraped_soundtracks(song_title=song_title,found_on_spotify="No",uri="None")
     return ""
 
   for song_title in soundtrack_song_titles:
@@ -166,3 +181,8 @@ while is_running:
 
   result = sp.playlist_add_items(playlist_id, track_uris)
   print(f"SUCCESSFULLY ADDED ITEMS TO PLAYLIST: {result}")
+
+  # ---------- GENERATE A CSV FILE CONTAINING THE SCRAPED SONG TITLES ---------- #
+
+  print(scraped_soundtracks)
+  pandas.DataFrame(scraped_soundtracks).to_csv(f"{movie_name}_soundtracks.csv")

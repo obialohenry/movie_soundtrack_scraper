@@ -167,3 +167,8 @@ while is_running:
 
   print(scraped_soundtracks)
   pandas.DataFrame(scraped_soundtracks).to_csv(f"{movie_name}_soundtracks.csv")
+  scraped_soundtracks = {
+  "song titles": [],
+  "found on spotify": [],
+  "spotify URI": [],
+  }

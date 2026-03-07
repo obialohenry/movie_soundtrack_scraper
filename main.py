@@ -154,7 +154,6 @@ while is_running:
     name=f"{movie_name} Soundtracks",
     public=False
   )
-    print(soundtracks_playlist)
   except spotipy.SpotifyException as e:
      print("Spotify API error:", e)
   else:
@@ -165,4 +164,5 @@ while is_running:
 
   # ---------- ADD ALL SUCCESSFULLY FOUND TRACKS TO THE PLAYLIST ---------- #
 
-  #  playlist_add_items(playlist_id, items, position=None)
+  result = sp.playlist_add_items(playlist_id, track_uris)
+  print(f"SUCCESSFULLY ADDED ITEMS TO PLAYLIST: {result}")

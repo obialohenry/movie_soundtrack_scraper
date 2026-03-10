@@ -1,5 +1,5 @@
 import requests
-from constants import WIKIPEDIA_HEADER
+from constants import WIKIPEDIA_HEADER,print_on_console
 
 WIKIPEDIA_URL = "https://en.wikipedia.org/w/api.php"
 SOUNDTRACK = "soundtrack"
@@ -10,7 +10,7 @@ class WikipediaMoviePage:
   def __init__(self) -> None:
     pass
 
-  def get_url(self,movie_name:str) -> str:
+  def get_page(self,movie_name:str) -> str:
     """"""
     params = {
         "action":"query",
@@ -20,19 +20,29 @@ class WikipediaMoviePage:
         "format": "json"
     }
     try:
+      print_on_console("🌐 Searching for the movie page on Wikipedia...")
       response = requests.get(url=WIKIPEDIA_URL,headers=WIKIPEDIA_HEADER,params=params)
       response.raise_for_status()
-    except Exception as e:
-       print("API error", e)
+    except Exception:
+       print_on_console("""
+        ❌ An error occured.
+        Please check the your internet and try again.
+          """, True
+        )
        return ""
     else:
       response_json = response.json()
       movie_titles = response_json["query"]["search"]
       movie_title = self._search_for_a_movie_title(movie_titles,SOUNDTRACK).replace(" ","_")
       if  movie_title:
+        print_on_console("✅ Movie page found.", True)
         return f"https://en.wikipedia.org/wiki/{movie_title}"
       else:
-        print(f"Could not get {movie_name} Wikipedia's Soundtrack page.")
+        print_on_console("""
+          ❌ Could not find a Wikipedia page for this movie.
+          Please check the spelling and try again.
+          """, True
+        )
       return ""
 
   def _search_for_a_movie_title(self,movies:list[dict],value)-> str:

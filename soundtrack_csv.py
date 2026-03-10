@@ -1,4 +1,5 @@
 import pandas
+from constants import print_on_console
 
 class SoundtrackCSV:
   def __init__(self) -> None:
@@ -16,7 +17,13 @@ class SoundtrackCSV:
 
   def create_CSV(self,movie_name:str)->None:
     """"""
+    print_on_console("Generating soundtrack CSV file...")
     pandas.DataFrame(self._soundtrack_data).to_csv(f"{movie_name}_soundtracks.csv")
+    print_on_console(f"""
+    ✅ CSV file saved successfully.
+                    
+      File saved as : {movie_name}_soundtrack.csv
+""", True)
     self._soundtrack_data = {
     "song titles": [],
     "found on spotify": [],

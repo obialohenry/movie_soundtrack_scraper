@@ -21,7 +21,15 @@ movies_soundtrack = MoviesSoundtrack()
 spotify = Spotify()
 soundtrack_csv = SoundtrackCSV()
 def users_choice()-> int:
-    """"""
+    """Ask for a user's input.
+
+    Behavior:
+      - Asks for a user's input while on a loop.
+      - If the user enters a value that is neither 1 nor 2, the loop continues.
+
+    Returns:
+      int: 1 if a user enters in 1, or 2 if a user enters in 2.
+    """
     while True:
       try:
         choice = int(input("Enter choice: "))

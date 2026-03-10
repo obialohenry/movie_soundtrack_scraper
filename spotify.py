@@ -14,51 +14,62 @@ SCOPE = "playlist-modify-private playlist-modify-public"
 REDIRECT_URI = "https://example.com"
 
 class Spotify:
-  """"""
-  
-  def __init__(self):
-    print_on_console("Connecting to Spotify...")
-    self.tracks = []
-    self.playlist_id = ""
-    self.sp =  spotipy.Spotify(auth_manager=SpotifyOAuth(
-    client_id=ID,
-    client_secret=SECRET,
-    redirect_uri=REDIRECT_URI,
-    scope=SCOPE
-  ))
-    print_on_console("✅ Successfully authenticated with Spotify.", True)
+    """Utility class for Spotify authentication, song search, playlist creation, and track insertion."""
     
-  def search_for_a_song(self,song_title:str)->str:
-    """"""
-    search_result = self.sp.search(song_title,limit=1,type="track")
-    if search_result:
-      items = search_result['tracks']['items']
-      if items:
-        track = items[0]
-        print_on_console(f"✅ Found: {song_title}",)
-        return track['uri']
-    print_on_console(f"❌ Not found on Spotify: {song_title}",)
-    return ""
-  
-  def create_a_playlist(self,movie_name:str)-> None:
-    """"""
-    print_on_console("Creating Spotify playlist for this movie...")
-    try:
-      soundtracks_playlist = self.sp.current_user_playlist_create(
-      name=f"{movie_name} Soundtracks",
-      public=False
-    )
-    except spotipy.SpotifyException as e:
-      print("Spotify API error:", e)
-    else:
-      if soundtracks_playlist:
-        print_on_console("✅ Playlist successfully created.", True)
-        self.playlist_id = soundtracks_playlist["id"]
-
-  def add_tracks_to_playlist(self)-> None:
-    """"""
-    print_on_console("Adding songs to the playlist...")
-    result = self.sp.playlist_add_items(self.playlist_id, self.tracks)
-    if result:
-      print_on_console(f"✅ {len(self.tracks)} songs added to the playlist.", True)
+    def __init__(self):
+      print_on_console("Connecting to Spotify...")
       self.tracks = []
+      self.playlist_id = ""
+      self.sp =  spotipy.Spotify(auth_manager=SpotifyOAuth(
+      client_id=ID,
+      client_secret=SECRET,
+      redirect_uri=REDIRECT_URI,
+      scope=SCOPE
+    ))
+      print_on_console("✅ Successfully authenticated with Spotify.", True)
+      
+    def search_for_a_song(self,song_title:str)->str:
+      """Search for a song on Spotify by title.
+      
+      Parameter:
+        - song_title (str): Title of the song to search for.
+      
+      Returns:
+        str: Spotify track URI if found, otherwise an empty string.
+      """
+      search_result = self.sp.search(song_title,limit=1,type="track")
+      if search_result:
+        items = search_result['tracks']['items']
+        if items:
+          track = items[0]
+          print_on_console(f"✅ Found: {song_title}",)
+          return track['uri']
+      print_on_console(f"❌ Not found on Spotify: {song_title}",)
+      return ""
+    
+    def create_a_playlist(self,movie_name:str)-> None:
+      """Create a private Spotify playlist and store its playlist ID.
+      
+      Parameters:
+        - movie_name (str): Name of the movie used in generating its playlist title.
+      """
+      print_on_console("Creating Spotify playlist for this movie...")
+      try:
+        soundtracks_playlist = self.sp.current_user_playlist_create(
+        name=f"{movie_name} Soundtracks",
+        public=False
+      )
+      except spotipy.SpotifyException as e:
+        print("Spotify API error:", e)
+      else:
+        if soundtracks_playlist:
+          print_on_console("✅ Playlist successfully created.", True)
+          self.playlist_id = soundtracks_playlist["id"]
+
+    def add_tracks_to_playlist(self)-> None:
+      """Add all collected track URIs to the created Spotify playlist."""
+      print_on_console("Adding songs to the playlist...")
+      result = self.sp.playlist_add_items(self.playlist_id, self.tracks)
+      if result:
+        print_on_console(f"✅ {len(self.tracks)} songs added to the playlist.", True)
+        self.tracks = []

@@ -8,8 +8,8 @@ from constants import print_on_console
 # Load environment variables from .env file
 load_dotenv()
 
-ID = os.environ["NKEMS_CLIENT_ID"]
-SECRET = os.environ["NKEMS_CLIENT_SECRET"]
+ID = os.environ["CLIENT_ID"]
+SECRET = os.environ["CLIENT_SECRET"]
 SCOPE = "playlist-modify-private playlist-modify-public"
 REDIRECT_URI = "https://example.com"
 
